@@ -80,28 +80,22 @@ const MsgList = () => {
         msgsEndRef.current?.scrollIntoView({ behavior: "smooth" })
     }
 
-    setInterval(() => {
-        const randomPayload = {
-            usrname: "asdasda",
-            href: "http://elhme",
-            message: "So iello there')</script>",
-        }
-
+    const addMsg = (payload) => {
         // print only the 50 last elements from the array
-        setMsgs([...msgs, randomPayload])
-    }, 1500)
+        setMsgs([...msgs, payload].slice(Math.max(msgs.length - 100, 0)))
+    }
 
-    useEffect(() => {
-        scrollToBottom()
-    }, [msgs]);
+    // useEffect(() => {
+    //     scrollToBottom()
+    // }, [msgs]);
 
     return (
         <div>
             {msgs.length == 0 ?
                 <div className="tsc-no-msg">No messages yet, be the first to post a message !</div>:
-                msgs.map((msg, index) => <Msg usrname={msg.usrname.slice(0, 14)}
+                msgs.map((msg, index) => <Msg usrname={msg.usrname}
                                             key={index} href={msg.href}
-                                            message={msg.message.slice(0, 120) + (msg.message.length >= 120 ? "..." : "")}
+                                            message={msg.message}
                                             isAdmin={msg.isAdmin ? msg.isAdmin: false} />)
             } <div ref={msgsEndRef} />
         </div>
@@ -121,6 +115,10 @@ const Board = () => {
 }
 
 
+// TO prevent an user to print the same message multipletime
+let LAST_MESSAGE = ""
+let LAST_MESSAGE_TIME_SENT = Date.now()
+
 /**
  * THe output of the whole component
  */
@@ -129,6 +127,34 @@ export default function App(props) {
     const [isActive, setActive] = useState(true); // default should be false
     // For the message am writing...
     const [txtMessage, setTxtMessage] = useState('');
+    // A ref for the input text
+    const inputRef = useRef(null)
+
+    useEffect(() => {
+        inputRef.current.focus();
+    }, [txtMessage]);
+
+    const checkAndSendTxtMessage = (ev) => {
+        if (ev.keyCode === 13){
+            if (ev.target.value.length > 0){
+                const msgg = ev.target.value
+                if (msgg.length > 0){
+                    // if it's past 10s you can send the same message or if
+                    // your new message is different from the precedent
+                    if (LAST_MESSAGE != msgg || Date.now() - LAST_MESSAGE_TIME_SENT > 10000){
+                        LAST_MESSAGE = msgg
+                        LAST_MESSAGE_TIME_SENT = Date.now()
+
+                        // for the serveur to breath...
+                        setTimeout(() => {
+                            console.log(msgg)
+                        }, 200)
+                    }
+                    setTxtMessage('')
+                }
+            }
+        }
+    }
 
     /**
      * The maggic toggle button simple as it
@@ -146,7 +172,9 @@ export default function App(props) {
      */
     const EmojiBox = () => (
         <div className="tsc-emojibox">
-            {EMOJI_EXPRESSIONS.map((e, index) => <button key={index} onClick={() => setTxtMessage(`${txtMessage}${e}`)}>{e}</button>)}
+            {EMOJI_EXPRESSIONS.map((e, index) => <button
+                key={index}
+                onClick={() => setTxtMessage(`${txtMessage}${e}`)}>{e}</button>)}
         </div>
     )
 
@@ -160,8 +188,10 @@ export default function App(props) {
                 <input type="text"
                         maxlength="130"
                         onChange={(e) => setTxtMessage(e.target.value)}
+                        onKeyUp={(e) => checkAndSendTxtMessage(e)}
                         value={txtMessage}
                         autoFocus
+                        ref={inputRef}
                         placeholder="Enter your message here..."
                         id="tsc-text-box"/>
             </div>

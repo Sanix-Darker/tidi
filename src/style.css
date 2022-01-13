@@ -11,8 +11,7 @@
 }
 
 #tsc-messages{
-    max-height: 30rem;
-    min-height: 30rem;
+    max-height: 27rem;
     transition: 0.3s;
     overflow: auto;
 }
