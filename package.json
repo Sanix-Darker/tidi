@@ -1,0 +1,50 @@
+{
+  "name": "ttspch",
+  "version": "0.1.0",
+  "description": "",
+  "source": "src/index.js",
+  "main": "dist/index.js",
+  "module": "dist/index.module.js",
+  "umd:main": "dist/index.umd.js",
+  "scripts": {
+    "dev": "preact watch",
+    "build": "preact build --no-prerender",
+    "build:widget": "microbundle build --external none",
+    "build:lib": "microbundle build -i src/component.js",
+    "lint": "eslint '{src,test}/**/*.js'",
+    "test": "jest"
+  },
+  "files": [
+    "dist"
+  ],
+  "eslintConfig": {
+    "extends": "preact",
+    "ignorePatterns": [
+      "build/"
+    ]
+  },
+  "author": "sanix-darker <s4nixd@gmail.com>",
+  "license": "MIT",
+  "peerDependencies": {
+    "preact": "^10.5.7"
+  },
+  "devDependencies": {
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-preact-pure": "^3.3.0",
+    "eslint": "^7.32.0",
+    "eslint-config-preact": "^1.1.3",
+    "jest": "^27.3.1",
+    "jest-preset-preact": "^4.0.2",
+    "microbundle": "^0.14.1",
+    "preact": "^10.5.7",
+    "preact-cli": "^3.0.5",
+    "preact-habitat": "^3.3.0",
+    "preact-render-to-string": "^5.1.12"
+  },
+  "jest": {
+    "preset": "jest-preset-preact",
+    "setupFiles": [
+      "<rootDir>/tests/__mocks__/setupTests.js"
+    ]
+  }
+}

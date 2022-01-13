@@ -1,0 +1,8 @@
+- faire les boutons emojis (sous forme de components, ce serait top)
+- que lorsqu'on cliques dessus, cela s'ajoute directement dans le champ texte
+- commencer a coder un server go pour les requettes websockets et setup une base de donnees qui ne sauvegarde que les 100 derniers messages de chaque instance de space
+- dev l'extension web chrome
+
+- interval de 0.5 secondes entre chaque message du meme user
+
+twitter selector for the pseudo and the username inside this nodeList : document.querySelectorAll("#react-root > div > div > div > header > div > div > div > div > div > div > div > div > div > div > span").forEach(e => console.log(e));
