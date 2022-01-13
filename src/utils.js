@@ -51,4 +51,4 @@ export const CSS_COLOR_NAMES = [
   "Wheat",
 ];
 
-export const EMOJI_EXPRESSIONS = ["😂", "❤️ ", "👍", "😎", "👎","😇", "☠️ ", "😡", "😳"];
+export const EMOJI_EXPRESSIONS = ["❤️ ", "✋", "👍", "👎", "😂", "😍", "😐", "💀", "😡", "😳"];

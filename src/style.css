@@ -10,8 +10,9 @@
     z-index: 99!important;
 }
 
-#tsc-ttspch-box #tsc-messages{
-    max-height: 40rem;
+#tsc-messages{
+    max-height: 30rem;
+    min-height: 30rem;
     transition: 0.3s;
     overflow: auto;
 }
@@ -58,7 +59,7 @@
 }
 
 .tsc-msg{
-    margin-bottom: 1px;
+    margin-bottom: 2px;
 }
 
 .tsc-no-msg, .tsc-emojibox{
@@ -82,8 +83,9 @@
 .tsc-emojibox button:hover{
     padding: 0px;
     position: relative;
-    font-size: 35px;
-    transition: .4s;
+    font-size: 20px;
+    transition: .3s;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .tsc-scroll-shadows {
