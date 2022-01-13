@@ -26,6 +26,10 @@ String.prototype.escape = function() {
     });
 };
 
+// generate a key from the incomming roomKey
+const hashCode = (s) => {
+  return s.split("").reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);
+}
 
 /**
  * Just getting the username indices for each letter nd get
@@ -70,6 +74,10 @@ const Msg = ({usrname, href, message, isAdmin=false}) => (
     </div>
 )
 
+
+/**
+ * The message list component that will content the list of messages
+ **/
 const MsgList = () => {
     // For incoming messages...
     const [msgs, setMsgs] = useState([])
@@ -92,24 +100,15 @@ const MsgList = () => {
     return (
         <div>
             {msgs.length == 0 ?
-                <div className="tsc-no-msg">No messages yet, be the first to post a message !</div>:
+                <div className="tsc-no-msg">
+                    No messages yet, be the first to post a message !
+                </div>:
                 msgs.map((msg, index) => <Msg usrname={msg.usrname}
-                                            key={index} href={msg.href}
-                                            message={msg.message}
-                                            isAdmin={msg.isAdmin ? msg.isAdmin: false} />)
+                                    key={index} href={msg.href}
+                                    message={msg.message}
+                                    isAdmin={msg.isAdmin ? msg.isAdmin: false} />
+                )
             } <div ref={msgsEndRef} />
-        </div>
-    )
-}
-
-/**
- * The Feed for the list of incomming messages
- **/
-const Board = () => {
-
-    return (
-        <div id="tsc-messages" className='tsc-scroll-shadows'>
-            <MsgList />
         </div>
     )
 }
@@ -119,12 +118,69 @@ const Board = () => {
 let LAST_MESSAGE = ""
 let LAST_MESSAGE_TIME_SENT = Date.now()
 
+const SettingBoard = ({usr=''}) => {
+    const [roomKey, setRoomKey] = useState(localStorage.getItem("roomKey"))
+    const [usrIn, setUsrIn] = useState(usr.length > 0 ? usr : localStorage.getItem("usrIn"))
+
+    const settingUpdate = (key, ev) => {
+        if (ev.keyCode === 13){
+            if (ev.target.value.length > 0){
+                localStorage.setItem(key, ev.target.value)
+            }
+        }
+    }
+
+    return (
+        <div>
+            <h2>ttspch</h2>
+            <hr/>
+            <b>{hashCode(roomKey)}</b>|<b>{usrIn}</b>
+            <hr/>
+            <input type="text"
+                    className="tsc-setting-input"
+                    placeholder="Your roomKey and press ENTER"
+                    onChange={(e) => setRoomKey(e.target.value)}
+                    onKeyUp={(e) => settingUpdate("roomKey", e)}
+                    value={roomKey} />
+
+            {usr.length == 0 ?
+                <input className="tsc-setting-input"
+                    type="text"
+                    onChange={(e) => setUsrIn(e.target.value)}
+                    onKeyUp={(e) => settingUpdate("usrIn", e)}
+                    placeholder="Your username and press ENTER"
+                    value={usr} />: null }
+
+            <br/><br/>
+            <div className="tsc-foot">ttspch was made by <a href="https://twitter.com/sanixdarker">@sanixdarker</a></div>
+        </div>
+
+    )
+}
+
+
+/**
+ * The Feed for the list of incomming messages
+ **/
+const Board = ({usr='', isSettingsActive=false}) => {
+
+    return (
+        <div id="tsc-messages" className='tsc-scroll-shadows'>
+            {isSettingsActive ? <SettingBoard usr={usr}/>: <MsgList />}
+        </div>
+    )
+}
+
+
 /**
  * THe output of the whole component
  */
 export default function App(props) {
     // For the visibility of the component
     const [isActive, setActive] = useState(true); // default should be false
+    // for the settings board
+    const [isSettingsActive, setSettingsActive] = useState(false); // default should be false
+
     // For the message am writing...
     const [txtMessage, setTxtMessage] = useState('');
     // A ref for the input text
@@ -148,7 +204,7 @@ export default function App(props) {
                         // for the serveur to breath...
                         setTimeout(() => {
                             console.log(msgg)
-                        }, 200)
+                        }, 100)
                     }
                     setTxtMessage('')
                 }
@@ -190,6 +246,7 @@ export default function App(props) {
                         onChange={(e) => setTxtMessage(e.target.value)}
                         onKeyUp={(e) => checkAndSendTxtMessage(e)}
                         value={txtMessage}
+                        autoComplete="off"
                         autoFocus
                         ref={inputRef}
                         placeholder="Enter your message here..."
@@ -201,12 +258,15 @@ export default function App(props) {
     return (
         <div id="tsc-ttspch-box" >
             <div className={`${isActive ? 'tsc-hide': 'tsc-show'}`}>
-                <Board />
-                <EmojiBox />
-                <TextBox />
+                <Board isSettingsActive={isSettingsActive} usr='darker' />
+                {!isSettingsActive ?
+                    <div>
+                        <EmojiBox /><TextBox />
+                    </div> : null
+                }
             </div>
             <ToggleButton />
-            {isActive ? <button>⚙️</button> : null }
+            {isActive ? <button onClick={() => setSettingsActive(!isSettingsActive)}>⚙️</button> : null }
         </div>
   );
 }

@@ -8,3 +8,7 @@
 - All the escape on characters and protection on the payload should be made before sending something to the backend and should be made also BY the backend
 
 twitter selector for the pseudo and the username inside this nodeList : document.querySelectorAll("#react-root > div > div > div > header > div > div > div > div > div > div > div > div > div > div > span").forEach(e => console.log(e));
+
+# to get the link and from the link, we can get the username
+document.querySelectorAll("[aria-label='Profile']").forEach(e => console.log(e.href));
+

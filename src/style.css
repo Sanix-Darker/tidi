@@ -26,6 +26,15 @@
     margin-bottom: 3px;
 }
 
+.tsc-foot{
+    text-align: center;
+    font-size: 11px;
+}
+
+.tsc-setting-input{
+    width: 100%;
+}
+
 .tsc-show{
     position: absolute;
     margin-top: 2rem;
