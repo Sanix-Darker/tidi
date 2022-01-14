@@ -26,6 +26,10 @@
     margin-bottom: 3px;
 }
 
+.tsc-setting-connect{
+    width: 100%;
+}
+
 .tsc-foot{
     text-align: center;
     font-size: 11px;
