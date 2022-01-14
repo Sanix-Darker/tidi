@@ -113,28 +113,50 @@ const MsgList = () => {
     )
 }
 
+// check if it's an url
+const isValidHttpUrl = (string) => {
+  let url;
 
-// TO prevent an user to print the same message multipletime
-let LAST_MESSAGE = ""
-let LAST_MESSAGE_TIME_SENT = Date.now()
+  try {
+    url = new URL(string);
+  } catch (_) {
+    return false;
+  }
+
+  return url.protocol === "http:" || url.protocol === "https:";
+}
+
+// check and return the key from a twitter space link
+const isTwitterSpace = (string) => {
+    if (isValidHttpUrl(string) && string.includes("twitter.com") && string.includes("space")){
+        return string.split("/")[string.split("/").length - 1].split("?")[0]
+    }
+    return ""
+}
+
+// TO save a setting key/alue to the localstore
+const settingUpdate = (key, ev) => {
+    if (ev.keyCode === 13){
+        if (ev.target.value.length > 0){
+            localStorage.setItem(key, ev.target.value)
+        }
+    }
+}
+
+// To format and get the key from twitter space or any other incomming key
+const formatRoomKey = (roomKey) => {
+    return hashCode(isTwitterSpace(roomKey).length > 0 ? isTwitterSpace(roomKey) : roomKey)
+}
 
 const SettingBoard = ({usr=''}) => {
     const [roomKey, setRoomKey] = useState(localStorage.getItem("roomKey"))
     const [usrIn, setUsrIn] = useState(usr.length > 0 ? usr : localStorage.getItem("usrIn"))
 
-    const settingUpdate = (key, ev) => {
-        if (ev.keyCode === 13){
-            if (ev.target.value.length > 0){
-                localStorage.setItem(key, ev.target.value)
-            }
-        }
-    }
-
     return (
         <div>
             <h2>ttspch</h2>
             <hr/>
-            <b>{hashCode(roomKey)}</b>|<b>{usrIn}</b>
+            <b>{formatRoomKey(roomKey)}</b>|<b>{usrIn}</b>
             <hr/>
             <input type="text"
                     className="tsc-setting-input"
@@ -171,6 +193,10 @@ const Board = ({usr='', isSettingsActive=false}) => {
     )
 }
 
+
+// TO prevent an user to print the same message multipletime
+let LAST_MESSAGE = ""
+let LAST_MESSAGE_TIME_SENT = Date.now()
 
 /**
  * THe output of the whole component
