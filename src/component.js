@@ -75,27 +75,50 @@ const Msg = ({usrname, href, message, isAdmin=false}) => (
 /**
  * The message list component that will content the list of messages
  **/
-const MsgList = () => {
+const MsgList = ({connection}) => {
     // For incoming messages...
     const [msgs, setMsgs] = useState([])
 
+    const msgsBoxRef = useRef(null)
     const msgsEndRef = useRef(null)
 
     const scrollToBottom = () => {
+        // msgsBoxRef.hoverElement.addEventListener('mouseleave', () => {
+        //     msgsEndRef.current?.scrollIntoView({ behavior: "smooth" })
+        // })
         msgsEndRef.current?.scrollIntoView({ behavior: "smooth" })
     }
 
     const addMsg = (payload) => {
         // print only the 50 last elements from the array
-        setMsgs([...msgs, payload].slice(Math.max(msgs.length - 100, 0)))
+        setMsgs(
+            msgs.concat(
+                {'usrname': payload["author"] == null ? 'x' : payload["author"], 'message': payload['message']}
+            ).slice(Math.max(msgs.length - 100, 0))
+        )
+        setTimeout(() => {
+            scrollToBottom()
+        }, 150)
     }
 
-    // useEffect(() => {
-    //     scrollToBottom()
-    // }, [msgs]);
+    useEffect(() => {
+        // listen to onmessage event
+        conn.onmessage = evt => {
+            console.log(evt)
+            // add the new message to state
+            try{
+                const payload = JSON.parse(evt.data)
+                if (payload.hasOwnProperty('author') && payload.hasOwnProperty('message')){
+                    addMsg(payload)
+                }
+            }catch(err){
+                console.log('tsc-err: ', err)
+            }
+        }
+    }, [msgs]);
 
     return (
-        <div id="tsc-messages" className='tsc-scroll-shadows'>
+        <div id="tsc-messages" ref={msgsBoxRef} className='tsc-scroll-shadows'>
             {msgs.length == 0 ?
                 <div className="tsc-no-msg">
                     No messages yet, be the first to post a message !
@@ -132,10 +155,19 @@ const isTwitterSpace = (string) => {
 }
 
 // TO save a setting key/alue to the localstore
-const settingUpdate = (key, ev) => {
+const settingUpdate = (connection, key, ev) => {
     if (ev.keyCode === 13){
         if (ev.target.value.length > 0){
             localStorage.setItem(key, ev.target.value)
+
+            if (key === "roomKey"){
+                const payload = {
+                  "action": "subscribe",
+                  "topic": `${formatRoomKey(ev.target.value)}`
+                }
+                console.log('suscribed to ', payload)
+                connection.send(JSON.stringify(payload))
+            }
         }
     }
 }
@@ -145,33 +177,35 @@ const formatRoomKey = (roomKey) => {
     return hashCode(isTwitterSpace(roomKey).length > 0 ? isTwitterSpace(roomKey) : roomKey)
 }
 
-const SettingBoard = ({usr=''}) => {
+const SettingBoard = ({connection, usr=''}) => {
     const [roomKey, setRoomKey] = useState(localStorage.getItem("roomKey"))
     const [usrIn, setUsrIn] = useState(usr.length > 0 ? usr : localStorage.getItem("usrIn"))
+
+    localStorage.setItem("usrIn", usrIn)
 
     return (
         <div id="tsc-setting-box">
             <h2>tidi-settings</h2>
-            <hr/>
-            <b>{formatRoomKey(roomKey)}</b>|<b>{usrIn}</b>
-            <hr/>
+            <hr/><b>{formatRoomKey(roomKey)}</b>|<b>{usrIn}</b><hr/>
             <input type="text"
                     className="tsc-setting-input"
                     placeholder="Your roomKey and press ENTER"
                     onChange={(e) => setRoomKey(e.target.value)}
-                    onKeyUp={(e) => settingUpdate("roomKey", e)}
+                    onKeyUp={(e) => settingUpdate(connection, "roomKey", e)}
                     value={roomKey} />
 
             {usr.length == 0 ?
                 <input className="tsc-setting-input"
                     type="text"
                     onChange={(e) => setUsrIn(e.target.value)}
-                    onKeyUp={(e) => settingUpdate("usrIn", e)}
+                    onKeyUp={(e) => settingUpdate(connection, "usrIn", e)}
                     placeholder="Your username and press ENTER"
                     value={usr} />: null }
 
             <br/><br/>
-            <div className="tsc-foot">ttspch was made by <a href="https://twitter.com/sanixdarker">@sanixdarker</a></div>
+            <div className="tsc-foot">
+                tidi was made by <a href="https://twitter.com/sanixdarker">@sanixdarker</a>
+            </div>
         </div>
 
     )
@@ -181,17 +215,23 @@ const SettingBoard = ({usr=''}) => {
 /**
  * The Feed for the list of incomming messages
  **/
-const Board = ({usr='', isSettingsActive=false}) => {
-
-    return (
-        <>{isSettingsActive ? <SettingBoard usr={usr}/>: <MsgList />}</>
-    )
+const Board = ({connection, usr='', isSettingsActive=false}) => {
+    return <>
+            <div style={{display: `${isSettingsActive ? 'block': 'none'}`}}>
+                <SettingBoard connection={connection} usr={usr}/>
+            </div>
+            <div style={{display: `${!isSettingsActive ? 'block': 'none'}`}}>
+                <MsgList connection={connection}/>
+            </div>
+    </>
 }
 
 
 // TO prevent an user to print the same message multipletime
 let LAST_MESSAGE = ""
 let LAST_MESSAGE_TIME_SENT = Date.now()
+let DEFAULT_HOST = "ws://127.0.0.1:1324"
+let conn = new WebSocket(`${DEFAULT_HOST}/socket`);
 
 /**
  * THe output of the whole component
@@ -221,11 +261,15 @@ export default function App(props) {
                     if (LAST_MESSAGE != msgg || Date.now() - LAST_MESSAGE_TIME_SENT > 10000){
                         LAST_MESSAGE = msgg
                         LAST_MESSAGE_TIME_SENT = Date.now()
-
-                        // for the serveur to breath...
+                        const msgpayload = {"author": localStorage.getItem("usrIn"), "message": msgg}
+                        const payload = {
+                          "action": "publish",
+                          "topic": `${formatRoomKey(localStorage.getItem("roomKey"))}`,
+                          "message": JSON.stringify(msgpayload)
+                        }
                         setTimeout(() => {
-                            console.log(msgg)
-                        }, 100)
+                            conn.send(JSON.stringify(payload))
+                        }, 300)
                     }
                     setTxtMessage('')
                 }
@@ -279,7 +323,7 @@ export default function App(props) {
     return (
         <div id="tsc-ttspch-box" >
             <div className={`${isActive ? 'tsc-hide': 'tsc-show'}`}>
-                <Board isSettingsActive={isSettingsActive} usr='darker' />
+                <Board connection={conn} isSettingsActive={isSettingsActive} usr='darker' />
                 {!isSettingsActive ?
                     <div>
                         <EmojiBox /><TextBox />
