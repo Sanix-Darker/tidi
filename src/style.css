@@ -16,11 +16,11 @@
     overflow: auto;
 }
 
-#tsc-messages{
+#tsc-messages, #tsc-setting-box{
     background: rgba(250, 250, 250, 0.7);
 }
 
-#tsc-text-box{
+#tsc-text-box, .tsc-setting-input{
     width: 96%;
     padding: 3px;
     margin-bottom: 3px;
@@ -29,10 +29,6 @@
 .tsc-foot{
     text-align: center;
     font-size: 11px;
-}
-
-.tsc-setting-input{
-    width: 100%;
 }
 
 .tsc-show{
@@ -84,12 +80,18 @@
     background: transparent;
     cursor: pointer;
     padding: 5px;
-    font-size: 14px;
+    font-size: 12px;
     transition: 1.1s;
 }
 
+.tsc-emojibox button{
+    transition: 2.7s;
+    margin-top: 0px;
+}
+
 .tsc-emojibox button:hover{
-    padding: 0px;
+    padding: 2px;
+    margin-top: -15px;
     position: relative;
     font-size: 20px;
     transition: .3s;

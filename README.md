@@ -1,4 +1,6 @@
-# ttspch
+# tidi
+
+The `2kb` bubble chat component for any website...
 
 ## CLI Commands
 
@@ -22,4 +24,3 @@ npm run lint
 npm run test
 ```
 
-For detailed explanation on how things work, checkout the [CLI Readme](https://github.com/preactjs/preact-cli/blob/master/README.md).

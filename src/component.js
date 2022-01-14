@@ -16,19 +16,16 @@ String.prototype.escape = function() {
             ';': '_',
             '\\\\': '_',
             '//': '_',
-            '<script': '__',
-            'window.': '__',
             '^': '_',
             '|': '_',
-            'alert(': '__',
-            '</script': '__'
         }[tag] || tag;
     });
 };
 
 // generate a key from the incomming roomKey
 const hashCode = (s) => {
-  return s.split("").reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);
+    if (s == null) return "0"
+    return s.split("").reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);
 }
 
 /**
@@ -98,7 +95,7 @@ const MsgList = () => {
     // }, [msgs]);
 
     return (
-        <div>
+        <div id="tsc-messages" className='tsc-scroll-shadows'>
             {msgs.length == 0 ?
                 <div className="tsc-no-msg">
                     No messages yet, be the first to post a message !
@@ -153,8 +150,8 @@ const SettingBoard = ({usr=''}) => {
     const [usrIn, setUsrIn] = useState(usr.length > 0 ? usr : localStorage.getItem("usrIn"))
 
     return (
-        <div>
-            <h2>ttspch</h2>
+        <div id="tsc-setting-box">
+            <h2>tidi-settings</h2>
             <hr/>
             <b>{formatRoomKey(roomKey)}</b>|<b>{usrIn}</b>
             <hr/>
@@ -187,9 +184,7 @@ const SettingBoard = ({usr=''}) => {
 const Board = ({usr='', isSettingsActive=false}) => {
 
     return (
-        <div id="tsc-messages" className='tsc-scroll-shadows'>
-            {isSettingsActive ? <SettingBoard usr={usr}/>: <MsgList />}
-        </div>
+        <>{isSettingsActive ? <SettingBoard usr={usr}/>: <MsgList />}</>
     )
 }
 
@@ -245,7 +240,7 @@ export default function App(props) {
         <button
             onClick={() => setActive(!isActive)}
             className={`tsc-toggle-button ${!isActive ? 'tsc-hide-button': ''}`} >
-            {isActive ? 'HIDE': 'SHOW'} TTSPCH BOX
+            {isActive ? 'HIDE': 'SHOW'} TIDI BOX
         </button>
     )
 
