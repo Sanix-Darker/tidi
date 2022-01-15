@@ -48,7 +48,6 @@ export const CSS_COLOR_NAMES = [
   "Thistle",
   "Turquoise",
   "Violet",
-  "Wheat",
 ];
 
 export const EMOJI_EXPRESSIONS = ["❤️ ", "✋", "👍", "👎", "😂", "😍", "😐", "💀", "😡", "😳"];

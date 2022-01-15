@@ -217,7 +217,7 @@ const settingUpdate = (setSettingsActive, conn, key, ev) => {
     if (ev.target.value.length > 0) {
       if (key === "roomKey") cleanConnectRoom(conn, ev.target.value);
       itemSet(key, ev.target.value);
-      setSettingsActive(false);
+      //setSettingsActive(false);
     }
   }
 };
@@ -231,9 +231,10 @@ const formatRoomKey = roomKey =>
 const SettingBoard = ({ conn, setSettingsActive, usr = "" }) => {
   const [roomKey, setRoomKey] = useState(itemGet("roomKey"));
   const [usrIn, setUsrIn] = useState(
-    usr.length > 0 ? usr : itemGet("usrIn")
+    (usr !== "null" && usr !== null) ? (usr.length > 0 ? usr : itemGet("usrIn")) : ''
   );
-  const label = "Write a room Key and just press ENTER";
+  const labelRoom = "Write a room Key and press ENTER";
+  const labelUsr = "Write your username and press ENTER";
   itemSet("usrIn", usrIn);
 
   return (
@@ -242,24 +243,27 @@ const SettingBoard = ({ conn, setSettingsActive, usr = "" }) => {
       <hr />
       <b>{formatRoomKey(roomKey)}|{usrIn}</b>
       <hr />
-      <small>{label}</small>
+      <small>{labelRoom}: <b>{roomKey}</b></small>
       <input
         type="text"
         className="tsc-setting-input"
-        placeholder={label}
+        placeholder={labelRoom}
         onChange={(e) => setRoomKey(e.target.value)}
         onKeyUp={(e) => settingUpdate(setSettingsActive, conn, "roomKey", e)}
         value={roomKey}
       />
       {usr.length == 0 ? (
-        <input
-          className="tsc-setting-input"
-          type="text"
-          onChange={(e) => setUsrIn(e.target.value)}
-          onKeyUp={(e) => settingUpdate(setSettingsActive, conn, "usrIn", e)}
-          placeholder="Your username and press ENTER"
-          value={usr}
-        />
+        <span>
+            <small>{labelUsr}: <b>{usrIn}</b></small>
+            <input
+              className="tsc-setting-input"
+              type="text"
+              onChange={(e) => setUsrIn(e.target.value)}
+              onKeyUp={(e) => settingUpdate(setSettingsActive, conn, "usrIn", e)}
+              placeholder={labelUsr}
+              value={usrIn}
+            />
+        </span>
       ) : null}
       <br />
       <div className="tsc-foot">
@@ -300,7 +304,7 @@ let LAST_MESSAGE_TIME_SENT = Date.now();
 /**
  * THe output of the whole component
  */
-export default function App({conn}) {
+export default function App({conn, usr}) {
   // For the visibility of the component
   const [isActive, setActive] = useState(true); // default should be false
   // for the settings board
@@ -322,6 +326,14 @@ export default function App({conn}) {
 
   const checkAndSendTxtMsg = (ev) => {
     if (ev.keyCode === 13) {
+        if (itemGet("usrIn") == null || itemGet("usrIn") == "null"){
+            alert("Please set up your username.")
+            return
+        }
+        if (itemGet("roomKey") == null || itemGet("roomKey") == "null"){
+            alert("Please set up your roomKey.")
+            return
+        }
       if (ev.target.value.length > 0) {
         const msgg = ev.target.value;
         if (msgg.length > 0) {
@@ -403,7 +415,7 @@ export default function App({conn}) {
           conn={conn}
           setSettingsActive={setSettingsActive}
           isSettingsActive={isSettingsActive}
-          usr="darker"
+          usr={usr}
         />
         {!isSettingsActive ? (
           <div>
