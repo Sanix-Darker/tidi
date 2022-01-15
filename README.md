@@ -75,6 +75,28 @@ npm run dev
 
 The app should be accessible on port `:8080`
 
+
+## Integration
+
+Let say you want to integrate it inside you're application, you will just have to pass to the component, two parameters:
+- The Host of the running service
+- The Username of the current user
+
+```html
+<link rel="stylesheet" href="https://...dist/index.css">
+
+<div data-tidi-component>
+  <script type="application/json">
+    {
+      "host": "ws://127.0.0.1:1324",
+      "usr": "d4rk3r",
+    }
+  </script>
+</div>
+
+<script type="module" src="https://...dist/index.module.js"></script>
+```
+
 ## Author
 
 - [darker](https://github.com/sanix-darker)
