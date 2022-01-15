@@ -1,0 +1,15 @@
+- dev l'extension web chrome
+
+- All the escape on characters and protection on the payload should be made before sending something to the backend and should be made also BY the backend
+
+- Gerer le fait de savoir si quelqu'un est online ou non (apres avoir ajouter un bouton explicite pur permettre la connexion d'un user dans une room ou un space (CONNEXION))
+
+twitter selector for the pseudo and the username inside this nodeList : document.querySelectorAll("#react-root > div > div > div > header > div > div > div > div > div > div > div > div > div > div > span").forEach(e => console.log(e));
+
+# to get the link and from the link, we can get the username
+document.querySelectorAll("[aria-label='Profile']").forEach(e => console.log(e.href));
+
+construire le build docker du backend apres avoir ajouter la logique des reforwardings par sessions uniquement, on ne peut pas rebrowcaster tout chez tous les utilisateurs meme s'ils ne sont pas censer etre dans la room en cours.... (gerer maybe redis pour stocker tout cela afain d'epargner de la memoire au container lui meme et mettre une date d'expiration de room avec un dernier message qui date de plus de 24h)
+
+Configurer des workers pour le backend, au moins 4 workers par defaut pour parralleliser la montee en charge...
+

@@ -1,0 +1,169 @@
+#tsc-ttspch-box{
+    font-size: 14px;
+    width: 17%;
+    min-width: 18rem;
+    position: fixed;
+    left: 7px;
+    bottom: 7px;
+    padding: 3px;
+    border-radius: 5px;
+    z-index: 99!important;
+}
+
+#tsc-messages{
+    max-height: 27rem;
+    transition: 0.3s;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#tsc-messages, #tsc-setting-box{
+    background: rgba(250, 250, 250, 0.7);
+}
+
+#tsc-text-box, .tsc-setting-input{
+    width: 96%;
+    padding: 3px;
+    margin-bottom: 3px;
+}
+
+.tsc-setting-connect{
+    width: 100%;
+}
+
+.tsc-foot{
+    text-align: center;
+    font-size: 11px;
+}
+
+.tsc-show{
+    position: absolute;
+    margin-top: 2rem;
+    margin-bottom: -45rem;
+    transition: 0.3s;
+}
+
+.tsc-hide{
+    transition: 0.7s;
+    margin: 0rem;
+}
+
+
+.tsc-hide-button{
+    width: 100%;
+    margin-bottom: -10px;
+    transition: 0.3s;
+}
+
+.tsc-hide-button:hover{
+    margin-bottom: 0px;
+}
+
+.tsc-usrname{
+    font-weight: bold;
+    text-decoration: none;
+}
+.tsc-usrname:hover{
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.tsc-msg{
+    margin-bottom: 2px;
+}
+
+.tsc-no-msg, .tsc-emojibox{
+    text-align: center;
+}
+
+.tsc-toggle-button{
+    width: 88%;
+    z-index: 999!important;
+}
+
+.tsc-emojibox button{
+    border: 0px;
+    background: transparent;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 12px;
+    transition: 1.1s;
+}
+
+.tsc-emojibox button{
+    transition: 2.7s;
+    margin-top: 0px;
+}
+
+.tsc-emojibox button:hover{
+    padding: 2px;
+    margin-top: -15px;
+    position: relative;
+    font-size: 20px;
+    transition: .3s;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.tsc-scroll-shadows {
+  max-height: 200px;
+  overflow: auto;
+
+  background:
+    /* Shadow Cover TOP */
+    linear-gradient(
+      white 30%,
+      rgba(255, 255, 255, 0)
+    ) center top,
+    
+    /* Shadow Cover BOTTOM */
+    linear-gradient(
+      rgba(255, 255, 255, 0), 
+      white 70%
+    ) center bottom,
+    
+    /* Shadow TOP */
+    radial-gradient(
+      farthest-side at 50% 0,
+      rgba(0, 0, 0, 0.2),
+      rgba(0, 0, 0, 0)
+    ) center top,
+    
+    /* Shadow BOTTOM */
+    radial-gradient(
+      farthest-side at 50% 100%,
+      rgba(0, 0, 0, 0.2),
+      rgba(0, 0, 0, 0)
+    ) center bottom;
+  
+  background-repeat: no-repeat;
+  background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
+  background-attachment: local, local, scroll, scroll;
+}
+
+/* Just for shadow effects and the scroll bar */
+.tsc-scroll-shadows {
+  list-style: none;
+  padding-right: 0.5rem;
+}
+.tsc-scroll-shadows > * {
+  padding: 0.2rem;
+}
+
+.tsc-scroll-shadows {
+  --scrollbarBG: transparent;
+  --thumbBG: #90a4ae;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--thumbBG) var(--scrollbarBG);
+}
+.tsc-scroll-shadows::-webkit-scrollbar {
+  width: 6px;
+}
+.tsc-scroll-shadows::-webkit-scrollbar-track {
+  background: var(--scrollbarBG);
+}
+.tsc-scroll-shadows::-webkit-scrollbar-thumb {
+  background-color: var(--thumbBG);
+  border-radius: 6px;
+  border: 3px solid var(--scrollbarBG);
+}
+
