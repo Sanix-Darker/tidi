@@ -296,8 +296,6 @@ const Board = ({
 // TO prevent an user to print the same message multipletime
 let LAST_MESSAGE = "";
 let LAST_MESSAGE_TIME_SENT = Date.now();
-let DEFAULT_HOST = "ws://127.0.0.1:1324";
-let conn = new WebSocket(`${DEFAULT_HOST}/socket`);
 
 /**
  * THe output of the whole component
