@@ -13,6 +13,7 @@ const (
 	publish     = "publish"
 	subscribe   = "subscribe"
 	unsubscribe = "unsubscribe"
+	goo         = "goo"
 )
 
 // a server type to store all subscriptions
@@ -43,6 +44,13 @@ type Content struct {
 	Author  string `json:"author"`
 	Message string `json:"message"`
 }
+
+type Goo struct {
+	U string `json:"u"`
+	R string `json:"r"`
+}
+
+var replacer = strings.NewReplacer("&", "&amp;", "<", "&lt;", ">", "&gt;", ";", "_", "\\\\", "_", "//", "_", "^", "_", "|", "_", "%", "_", "$", "_")
 
 func (s *Server) Send(client *Client, message string) {
 	client.Connection.WriteMessage(1, []byte(message))
@@ -75,6 +83,10 @@ func (s *Server) ProcessMessage(client Client, messageType int, payload []byte) 
 	}
 
 	switch m.Action {
+	case goo:
+		s.Goo([]byte(m.Message))
+		break
+
 	case publish:
 		s.Publish(m.Topic, []byte(m.Message))
 		break
@@ -97,8 +109,6 @@ func (s *Server) ProcessMessage(client Client, messageType int, payload []byte) 
 
 func (s *Server) Publish(topic string, message []byte) {
 	var clients []Client
-
-	replacer := strings.NewReplacer("&", "&amp;", "<", "&lt;", ">", "&gt;", ";", "_", "\\\\", "_", "//", "_", "^", "_", "|", "_", "%", "_", "$", "_")
 
 	c := Content{}
 	if err := json.Unmarshal(message, &c); err != nil {
@@ -126,8 +136,43 @@ func (s *Server) Publish(topic string, message []byte) {
 	}
 }
 
+func Shrink(val string, ratio float32) int32 {
+	if len(val) > 0 {
+		return 0
+	}
+	return int32(float32(len(val)) - (float32(len(val)) * ratio))
+}
+
+func (s *Server) Goo(message []byte) {
+	var clients []Client
+
+	g := Goo{}
+	if err := json.Unmarshal(message, &g); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	cString := "{\"author\": \"$erver\", \"message\": \"" + string(g.U) + " joined " + string(g.R) + "\" }"
+	fmt.Println(cString)
+	// get list of clients subscribed to topic
+	for _, sub := range s.Subscriptions {
+		if sub.Topic == string(g.R) {
+			clients = append(clients, *sub.Clients...)
+		}
+	}
+
+	// send to clients
+	for _, client := range clients {
+		s.Send(&client, string(cString))
+	}
+}
+
 func (s *Server) Subscribe(client *Client, topic string) {
 	exist := false
+
+	// print("topic: " + topic)
+	// topic = topic[:Shrink(topic, 0.3)]
+	// print("topic: " + topic)
 
 	// find existing topics
 	for _, sub := range s.Subscriptions {
@@ -152,6 +197,8 @@ func (s *Server) Subscribe(client *Client, topic string) {
 }
 
 func (s *Server) Unsubscribe(client *Client, topic string) {
+
+	//topic = replacer.Replace(topic[:Shrink(topic, 0.3)])
 	// Read all topics
 	for _, sub := range s.Subscriptions {
 		if sub.Topic == topic {

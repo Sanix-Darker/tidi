@@ -212,14 +212,12 @@ const cleanConnectRoom = (conn, roomKey, action = "subscribe") => {
 };
 
 // TO save a setting key/alue to the localstore
-const settingUpdate = (setSettingsActive, conn, key, ev) => {
-  if (ev.keyCode === 13) {
-    if (ev.target.value.length > 0) {
-      if (key === "roomKey") cleanConnectRoom(conn, ev.target.value);
-      itemSet(key, ev.target.value);
-      //setSettingsActive(false);
-    }
-  }
+const settingUpdate = (setSettingsActive, conn, key, value, keyCode=1) => {
+  if (keyCode === 13)
+        if (value.length > 0)
+            if (key === "roomKey") cleanConnectRoom(conn, value);
+
+    itemSet(key, value);
 };
 
 // To format and get the key from twitter space or any other incomming key
@@ -231,10 +229,10 @@ const formatRoomKey = roomKey =>
 const SettingBoard = ({ conn, setSettingsActive, usr = "" }) => {
   const [roomKey, setRoomKey] = useState(itemGet("roomKey"));
   const [usrIn, setUsrIn] = useState(
-    (usr !== "null" && usr !== null) ? (usr.length > 0 ? usr : itemGet("usrIn")) : ''
+    (usr !== "null" && usr !== null) ? (usr.length > 0 ? usr : (itemGet("usrIn") !== null && itemGet("usrIn") !== "null") ? itemGet("usrIn") : '') : ''
   );
-  const labelRoom = "Write a room Key and press ENTER";
-  const labelUsr = "Write your username and press ENTER";
+  const labelRoom = "Write a room Key";
+  const labelUsr = "Write your username";
   itemSet("usrIn", usrIn);
 
   return (
@@ -248,8 +246,13 @@ const SettingBoard = ({ conn, setSettingsActive, usr = "" }) => {
         type="text"
         className="tsc-setting-input"
         placeholder={labelRoom}
-        onChange={(e) => setRoomKey(e.target.value)}
-        onKeyUp={(e) => settingUpdate(setSettingsActive, conn, "roomKey", e)}
+        onChange={(e) => {
+            if (e.target.value !== ""){
+                itemSet("roomKey", e.target.value);
+            }
+            setRoomKey(e.target.value);
+        }}
+        onKeyUp={(e) => settingUpdate(setSettingsActive, conn, "roomKey", e.target.value, e.target.keyCode)}
         value={roomKey}
       />
       {usr.length == 0 ? (
@@ -258,13 +261,43 @@ const SettingBoard = ({ conn, setSettingsActive, usr = "" }) => {
             <input
               className="tsc-setting-input"
               type="text"
-              onChange={(e) => setUsrIn(e.target.value)}
-              onKeyUp={(e) => settingUpdate(setSettingsActive, conn, "usrIn", e)}
+              onChange={(e) => {
+                if (e.target.value !== ""){
+                    itemSet("usrIn", e.target.value);
+                }
+                setUsrIn(e.target.value);
+              }}
+              onKeyUp={(e) => settingUpdate(setSettingsActive, conn, "usrIn", e.target.value, e.target.keyCode)}
               placeholder={labelUsr}
               value={usrIn}
             />
         </span>
       ) : null}
+      <br />
+      <button
+        className="tsc-setting-connect"
+        onClick={() => {
+            if (roomKey.length == 0 && usrIn.length == 0){
+                alert("These credentials cannot be empty...")
+                return
+            }
+            settingUpdate(setSettingsActive, conn, "roomKey", roomKey, 13)
+            settingUpdate(setSettingsActive, conn, "usrIn", usrIn, 13)
+
+            const pyld = {
+                "action": "goo",
+                "topic": roomKey,
+                "message": jString({"u": usrIn, "r": `${formatRoomKey(roomKey)}`})
+            }
+            console.log(pyld)
+            conn.send(jString(pyld));
+
+            setSettingsActive(false)
+        }}
+      >
+        CONNECT TO THE ROOM
+      </button>
+      <br />
       <br />
       <div className="tsc-foot">
         by <a target="_blank" href="https://twitter.com/sanixdarker">@sanixdarker</a>
