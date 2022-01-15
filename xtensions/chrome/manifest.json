@@ -1,0 +1,15 @@
+{
+    "name": "TIDI",
+    "description": "A small chat component for the web",
+    "version": "0.1.1",
+    "icons": {
+        "16": "img/icon-16.png"
+    },
+    "author": "sanix-darker",
+    "browser_action": {
+        "default_icon": "img/icon-16.png",
+        "default_title": "TIDI-BOX",
+        "default_popup": "popup.html"
+    },
+    "manifest_version": 2
+}

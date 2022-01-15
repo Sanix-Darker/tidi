@@ -82,20 +82,14 @@ Let say you want to integrate it inside you're application, you will just have t
 - The Host of the running service
 - The Username of the current user
 
-```html
-<link rel="stylesheet" href="https://...dist/index.css">
+![integration](./readme-resources/integration.png)
 
-<div data-tidi-component>
-  <script type="application/json">
-    {
-      "host": "ws://127.0.0.1:1324",
-      "usr": "d4rk3r",
-    }
-  </script>
-</div>
 
-<script type="module" src="https://...dist/index.module.js"></script>
-```
+## Xtensions
+
+I managed to make a small test chrome web extension for tidi and it's working pretty fine tho on a NFT twitter space...
+
+![xtension](./readme-resources/xtension.png)
 
 ## Author
 
