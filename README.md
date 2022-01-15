@@ -1,13 +1,13 @@
 # tidi
 
-Meet tidi, the `2kb` bubble chat component for any website... made using preact.
+Meet tidi, the `2kb` bubble chat component for any website... made using preact, running with a 9MB compiled backend service.
 
 ![screen](./readme-resources/size.png)
 
 ## Requirements
 
 - node/npm
-- golang
+- go
 - Docker (optional for the prod)
 
 ## CLI Commands
@@ -34,13 +34,9 @@ cd ./backend && make run
 
 ```bash
 # some cleans 
-rm -rf dist build
-
-# Optional build npm ready bundles to be consumed by other Preact web apps
-npm run build:widget
-
+# build npm ready bundles to be consumed by other Preact web apps
 # copy the final.html from source to dist
-cp ./src/final.html ./dist/index.html
+make build
 
 # then run de dist content using serve or http-server
 cd dist && http-server

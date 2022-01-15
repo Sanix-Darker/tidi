@@ -1,7 +1,16 @@
 node_modules
 .vscode
 build
-dist
 size-plugin.json
 backend/backend
 backend/tidi
+
+dist/index.css.map
+dist/index.js
+dist/index.js.map
+dist/index.modern.js
+dist/index.modern.js.map
+dist/index.module.js.map
+dist/index.umd.js
+dist/index.umd.js.map
+
