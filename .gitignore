@@ -4,3 +4,4 @@ build
 dist
 size-plugin.json
 backend/backend
+backend/tidi

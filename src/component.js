@@ -7,7 +7,7 @@ import "./style.css";
  * A security-check to escape html/js tags expressions
  */
 String.prototype.escape = function () {
-  return this.replace(/[&<>]/g, function (tag) {
+  return this.replace(/[&<div>]/g, function (tag) {
     return (
       {
         "&": "&amp;",
@@ -263,7 +263,7 @@ const SettingBoard = ({ conn, setSettingsActive, usr = "" }) => {
       ) : null}
       <br />
       <div className="tsc-foot">
-        by <a href="https://twitter.com/sanixdarker">@sanixdarker</a>
+        by <a target="_blank" href="https://twitter.com/sanixdarker">@sanixdarker</a>
       </div>
       <br />
     </div>
@@ -279,7 +279,7 @@ const Board = ({
   usr = "",
   isSettingsActive = false,
 }) => (
-  <>
+  <div>
     <div style={{ display: `${isSettingsActive ? "block" : "none"}` }}>
       <SettingBoard
         setSettingsActive={setSettingsActive}
@@ -290,7 +290,7 @@ const Board = ({
     <div style={{ display: `${!isSettingsActive ? "block" : "none"}` }}>
       <MsgList conn={conn} />
     </div>
-  </>
+  </div>
 );
 
 // TO prevent an user to print the same message multipletime
@@ -406,10 +406,10 @@ export default function App({conn}) {
           usr="darker"
         />
         {!isSettingsActive ? (
-          <>
+          <div>
             <EmojiBox />
             <TextBox />
-          </>
+          </div>
         ) : null}
       </div>
       <ToggleButton />
