@@ -89,7 +89,9 @@ Let say you want to integrate it inside you're application, you will just have t
 
 I managed to make a small test chrome web extension for tidi and it's working pretty fine tho on a NFT twitter space...
 
-![xtension](./readme-resources/xtension.png)
+Click on the image to whatch the video:
+
+[![xtension](./readme-resources/xtension.png)](https://youtu.be/sSj8BVSP7P4)
 
 ## Author
 
