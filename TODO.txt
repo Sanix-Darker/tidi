@@ -11,5 +11,6 @@ document.querySelectorAll("[aria-label='Profile']").forEach(e => console.log(e.h
 
 construire le build docker du backend apres avoir ajouter la logique des reforwardings par sessions uniquement, on ne peut pas rebrowcaster tout chez tous les utilisateurs meme s'ils ne sont pas censer etre dans la room en cours.... (gerer maybe redis pour stocker tout cela afain d'epargner de la memoire au container lui meme et mettre une date d'expiration de room avec un dernier message qui date de plus de 24h)
 
+
 Configurer des workers pour le backend, au moins 4 workers par defaut pour parralleliser la montee en charge...
 
