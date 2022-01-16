@@ -53,13 +53,12 @@ The service should be running on port `:1324`
 #### Prod
 
 ```bash
-# some cleans 
-# build npm ready bundles to be consumed by other Preact web apps
-# copy the final.html from source to dist
-# optional, because you can use the one from this repo directly...
+# This step is optional, because you can use the provided dist resource,
+# ths command will install dependencies, build bundles to be consumed
+# copy the appropriate html file in dist
 make build-dist
 
-# then run de dist content using serve or http-server
+# then serve the dist folder with an http server
 cd dist && http-server
 ```
 

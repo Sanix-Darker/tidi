@@ -1,6 +1,6 @@
 {
   "name": "tidi",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "",
   "source": "src/index.js",
   "main": "dist/index.js",
