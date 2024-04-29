@@ -64,9 +64,9 @@ const colorIndiceFromUsr = (text) => {
  * what did you expect ?
  *
  */
-const UsrName = ({ usrname, color, href, isAdmin = false }) => (
+const UsrName = ({ usrname, color, href, isAdmin = false, isOnline = false }) => (
   <a
-    className="tsc-usrname"
+    className={`tsc-usrname ${isOnline ? 'online' : 'offline'}`}
     style={{ color }}
     title={isAdmin ? "admin" : "user"}
     href={href}
@@ -75,7 +75,6 @@ const UsrName = ({ usrname, color, href, isAdmin = false }) => (
     {usrname}:
   </a>
 );
-
 /**
  * The Msg component... too lazy to describe it,
  * as you can see it takes 3 incomming parameters... that's all
@@ -99,9 +98,11 @@ const Msg = ({ usrname, href, message, isAdmin = false }) => (
 /**
  * The message list component that will content the list of messages
  **/
+
 const MsgList = ({ conn }) => {
   // For incoming messages...
   const [msgs, setMsgs] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState([]);
 
   const msgsEndRef = useRef(null);
 
@@ -141,6 +142,11 @@ const MsgList = ({ conn }) => {
         console.log("tsc-err: ", err);
       }
     };
+
+    // Handle online users
+    conn.on('onlineUsers', (users) => {
+      setOnlineUsers(users);
+    });
   }, [msgs]);
 
   return (
@@ -157,6 +163,7 @@ const MsgList = ({ conn }) => {
             href={msg.href}
             message={msg.message}
             isAdmin={msg.isAdmin ? msg.isAdmin : false}
+            isOnline={onlineUsers.includes(msg.usrname)}
           />
         ))
       )}{" "}
@@ -164,6 +171,7 @@ const MsgList = ({ conn }) => {
     </div>
   );
 };
+
 
 // check if it's an url
 const isValidHttpUrl = (string) => {

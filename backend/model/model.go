@@ -19,7 +19,9 @@ const (
 // a server type to store all subscriptions
 type Server struct {
 	Subscriptions []Subscription
+	OnlineClients map[string]*Client // Map to track online clients
 }
+
 
 // each subscription consists of topic-name & client
 type Subscription struct {
@@ -31,6 +33,7 @@ type Subscription struct {
 type Client struct {
 	ID         string
 	Connection *websocket.Conn
+	IsOnline   bool // Add this field to indicate if the client is online or not
 }
 
 // type for a valid message.
@@ -49,6 +52,8 @@ type Goo struct {
 	U string `json:"u"`
 	R string `json:"r"`
 }
+
+
 
 var replacer = strings.NewReplacer("&", "&amp;", "<", "&lt;", ">", "&gt;", ";", "_", "\\\\", "_", "//", "_", "^", "_", "|", "_", "%", "_", "$", "_")
 
@@ -170,20 +175,18 @@ func (s *Server) Goo(message []byte) {
 func (s *Server) Subscribe(client *Client, topic string) {
 	exist := false
 
-	// print("topic: " + topic)
-	// topic = topic[:Shrink(topic, 0.3)]
-	// print("topic: " + topic)
-
-	// find existing topics
+	// Find existing topics
 	for _, sub := range s.Subscriptions {
-		// if found, add client
+		// If found, add client and set IsOnline to true
 		if sub.Topic == topic {
 			exist = true
 			*sub.Clients = append(*sub.Clients, *client)
+			s.OnlineClients[client.ID] = client
+			client.IsOnline = true
 		}
 	}
 
-	// else, add new topic & add client to that topic
+	// If topic doesn't exist, create new topic and add client
 	if !exist {
 		newClient := &[]Client{*client}
 
@@ -193,27 +196,27 @@ func (s *Server) Subscribe(client *Client, topic string) {
 		}
 
 		s.Subscriptions = append(s.Subscriptions, *newTopic)
+		s.OnlineClients[client.ID] = client
+		client.IsOnline = true
 	}
 }
 
 func (s *Server) Unsubscribe(client *Client, topic string) {
-
-	//topic = replacer.Replace(topic[:Shrink(topic, 0.3)])
-	// Read all topics
+	// Find the topic
 	for _, sub := range s.Subscriptions {
 		if sub.Topic == topic {
-			// Read all topics' client
+			// Find the client in the topic
 			for i := 0; i < len(*sub.Clients); i++ {
 				if client.ID == (*sub.Clients)[i].ID {
-					// If found, remove client
+					// Remove the client and set IsOnline to false
 					if i == len(*sub.Clients)-1 {
-						// if it's stored as the last element, crop the array length
 						*sub.Clients = (*sub.Clients)[:len(*sub.Clients)-1]
 					} else {
-						// if it's stored in between elements, overwrite the element and reduce iterator to prevent out-of-bound
 						*sub.Clients = append((*sub.Clients)[:i], (*sub.Clients)[i+1:]...)
 						i--
 					}
+					delete(s.OnlineClients, client.ID)
+					client.IsOnline = false
 				}
 			}
 		}
