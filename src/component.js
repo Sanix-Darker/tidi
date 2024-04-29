@@ -7,15 +7,17 @@ import "./style.css";
  * A security-check to escape html/js tags expressions
  */
 String.prototype.escape = function () {
-  return this.replace(/[&<div>]/g, function (tag) {
+  return this.replace(/[&<>"';\\\/^|%$]/g, function (tag) {
     return (
       {
         "&": "&amp;",
         "<": "&lt;",
         ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
         ";": "_",
-        "\\\\": "_",
-        "//": "_",
+        "\\": "_",
+        "/": "_",
         "^": "_",
         "|": "_",
         "%": "_",
@@ -26,17 +28,16 @@ String.prototype.escape = function () {
 };
 
 // to get from localhost
-const itemGet = key => localStorage.getItem(key)
+const itemGet = (key) => localStorage.getItem(key);
 // to set an item inside the localstorage
-const itemSet = (key, value) => localStorage.setItem(key, value)
+const itemSet = (key, value) => localStorage.setItem(key, value);
 // json parse
-const jString = val => JSON.stringify(val)
+const jString = (val) => JSON.stringify(val);
 // json parse value
-const jParse = val => JSON.parse(val)
-
+const jParse = (val) => JSON.parse(val);
 
 // generate a key from the incomming roomKey
-const hashCode = s => {
+const hashCode = (s) => {
   if (s == null) return "0";
   return s.split("").reduce(function (a, b) {
     a = (a << 5) - a + b.charCodeAt(0);
@@ -48,7 +49,7 @@ const hashCode = s => {
  * Just getting the username indices for each letter nd get
  * the number for the color in the array
  */
-const colorIndiceFromUsr = text => {
+const colorIndiceFromUsr = (text) => {
   let result = -3;
   for (let i = 0; i < text.length; i++) {
     let code = text.toUpperCase().charCodeAt(i);
@@ -63,9 +64,9 @@ const colorIndiceFromUsr = text => {
  * what did you expect ?
  *
  */
-const UsrName = ({ usrname, color, href, isAdmin = false }) => (
+const UsrName = ({ usrname, color, href, isAdmin = false, isOnline = false }) => (
   <a
-    className="tsc-usrname"
+    className={`tsc-usrname ${isOnline ? 'online' : 'offline'}`}
     style={{ color }}
     title={isAdmin ? "admin" : "user"}
     href={href}
@@ -74,7 +75,6 @@ const UsrName = ({ usrname, color, href, isAdmin = false }) => (
     {usrname}:
   </a>
 );
-
 /**
  * The Msg component... too lazy to describe it,
  * as you can see it takes 3 incomming parameters... that's all
@@ -98,9 +98,11 @@ const Msg = ({ usrname, href, message, isAdmin = false }) => (
 /**
  * The message list component that will content the list of messages
  **/
+
 const MsgList = ({ conn }) => {
   // For incoming messages...
   const [msgs, setMsgs] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState([]);
 
   const msgsEndRef = useRef(null);
 
@@ -108,7 +110,7 @@ const MsgList = ({ conn }) => {
     msgsEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const addMsg = payload => {
+  const addMsg = (payload) => {
     // print only the 50 last elements from the array
     setMsgs(
       msgs
@@ -125,7 +127,7 @@ const MsgList = ({ conn }) => {
 
   useEffect(() => {
     // listen to onmessage event
-    conn.onmessage = evt => {
+    conn.onmessage = (evt) => {
       // console.log(evt);
       // add the new message to state
       try {
@@ -140,6 +142,11 @@ const MsgList = ({ conn }) => {
         console.log("tsc-err: ", err);
       }
     };
+
+    // Handle online users
+    conn.on('onlineUsers', (users) => {
+      setOnlineUsers(users);
+    });
   }, [msgs]);
 
   return (
@@ -156,6 +163,7 @@ const MsgList = ({ conn }) => {
             href={msg.href}
             message={msg.message}
             isAdmin={msg.isAdmin ? msg.isAdmin : false}
+            isOnline={onlineUsers.includes(msg.usrname)}
           />
         ))
       )}{" "}
@@ -164,8 +172,9 @@ const MsgList = ({ conn }) => {
   );
 };
 
+
 // check if it's an url
-const isValidHttpUrl = string => {
+const isValidHttpUrl = (string) => {
   let url;
 
   try {
@@ -178,7 +187,7 @@ const isValidHttpUrl = string => {
 };
 
 // check and return the key from a twitter space link
-const isTwitterSpace = string => {
+const isTwitterSpace = (string) => {
   if (
     isValidHttpUrl(string) &&
     string.includes("twitter.com") &&
@@ -202,8 +211,7 @@ const connectRoom = (conn, roomKey, action = "subscribe") => {
 };
 
 const cleanConnectRoom = (conn, roomKey, action = "subscribe") => {
-  if (itemGet("roomKey") !== null)
-    prevRoom = itemGet("roomKey");
+  if (itemGet("roomKey") !== null) prevRoom = itemGet("roomKey");
   if (prevRoom.length > 0)
     // We try to unsuscribe safely first
     connectRoom(conn, prevRoom, "unsubscribe");
@@ -212,16 +220,15 @@ const cleanConnectRoom = (conn, roomKey, action = "subscribe") => {
 };
 
 // TO save a setting key/alue to the localstore
-const settingUpdate = (setSettingsActive, conn, key, value, keyCode=1) => {
+const settingUpdate = (setSettingsActive, conn, key, value, keyCode = 1) => {
   if (keyCode === 13)
-        if (value.length > 0)
-            if (key === "roomKey") cleanConnectRoom(conn, value);
+    if (value.length > 0) if (key === "roomKey") cleanConnectRoom(conn, value);
 
-    itemSet(key, value);
+  itemSet(key, value);
 };
 
 // To format and get the key from twitter space or any other incomming key
-const formatRoomKey = roomKey =>
+const formatRoomKey = (roomKey) =>
   hashCode(
     isTwitterSpace(roomKey).length > 0 ? isTwitterSpace(roomKey) : roomKey
   );
@@ -229,7 +236,13 @@ const formatRoomKey = roomKey =>
 const SettingBoard = ({ conn, setSettingsActive, usr = "" }) => {
   const [roomKey, setRoomKey] = useState(itemGet("roomKey"));
   const [usrIn, setUsrIn] = useState(
-    (usr !== "null" && usr !== null) ? (usr.length > 0 ? usr : (itemGet("usrIn") !== null && itemGet("usrIn") !== "null") ? itemGet("usrIn") : '') : ''
+    usr !== "null" && usr !== null
+      ? usr.length > 0
+        ? usr
+        : itemGet("usrIn") !== null && itemGet("usrIn") !== "null"
+        ? itemGet("usrIn")
+        : ""
+      : ""
   );
   const labelRoom = "Write a room Key";
   const labelUsr = "Write your username";
@@ -239,60 +252,82 @@ const SettingBoard = ({ conn, setSettingsActive, usr = "" }) => {
     <div id="tsc-setting-box">
       <h2>tidi-settings</h2>
       <hr />
-      <b>{formatRoomKey(roomKey)}|{usrIn}</b>
+      <b>
+        {formatRoomKey(roomKey)}|{usrIn}
+      </b>
       <hr />
-      <small>{labelRoom}: <b>{roomKey}</b></small>
+      <small>
+        {labelRoom}: <b>{roomKey}</b>
+      </small>
       <input
         type="text"
         className="tsc-setting-input"
         placeholder={labelRoom}
         onChange={(e) => {
-            if (e.target.value !== ""){
-                itemSet("roomKey", e.target.value);
-            }
-            setRoomKey(e.target.value);
+          if (e.target.value !== "") {
+            itemSet("roomKey", e.target.value);
+          }
+          setRoomKey(e.target.value);
         }}
-        onKeyUp={(e) => settingUpdate(setSettingsActive, conn, "roomKey", e.target.value, e.target.keyCode)}
+        onKeyUp={(e) =>
+          settingUpdate(
+            setSettingsActive,
+            conn,
+            "roomKey",
+            e.target.value,
+            e.target.keyCode
+          )
+        }
         value={roomKey}
       />
       {usr.length == 0 ? (
         <span>
-            <small>{labelUsr}: <b>{usrIn}</b></small>
-            <input
-              className="tsc-setting-input"
-              type="text"
-              onChange={(e) => {
-                if (e.target.value !== ""){
-                    itemSet("usrIn", e.target.value);
-                }
-                setUsrIn(e.target.value);
-              }}
-              onKeyUp={(e) => settingUpdate(setSettingsActive, conn, "usrIn", e.target.value, e.target.keyCode)}
-              placeholder={labelUsr}
-              value={usrIn}
-            />
+          <small>
+            {labelUsr}: <b>{usrIn}</b>
+          </small>
+          <input
+            className="tsc-setting-input"
+            type="text"
+            onChange={(e) => {
+              if (e.target.value !== "") {
+                itemSet("usrIn", e.target.value);
+              }
+              setUsrIn(e.target.value);
+            }}
+            onKeyUp={(e) =>
+              settingUpdate(
+                setSettingsActive,
+                conn,
+                "usrIn",
+                e.target.value,
+                e.target.keyCode
+              )
+            }
+            placeholder={labelUsr}
+            value={usrIn}
+          />
         </span>
       ) : null}
       <br />
       <button
         className="tsc-setting-connect"
         onClick={() => {
-            if (roomKey.length == 0 && usrIn.length == 0){
-                alert("These credentials cannot be empty...")
-                return
-            }
-            settingUpdate(setSettingsActive, conn, "roomKey", roomKey, 13)
-            settingUpdate(setSettingsActive, conn, "usrIn", usrIn, 13)
+          if (roomKey.length == 0 && usrIn.length == 0) {
+            alert("These credentials cannot be empty...");
+            return;
+          }
+          settingUpdate(setSettingsActive, conn, "roomKey", roomKey, 13);
+          settingUpdate(setSettingsActive, conn, "usrIn", usrIn, 13);
 
-            const pyld = {
-                "action": "goo",
-                "topic": roomKey,
-                "message": jString({"u": usrIn, "r": `${formatRoomKey(roomKey)}`})
-            }
-            console.log(pyld)
-            conn.send(jString(pyld));
+          const pyld = {
+            action: "goo",
+            topic: roomKey,
+            message: jString({ u: usrIn, r: `${formatRoomKey(roomKey)}` }),
+          };
+          console.log(pyld);
+          conn.send(jString(pyld));
 
-            setSettingsActive(false)
+          setSettingsActive(false);
         }}
       >
         CONNECT TO THE ROOM
@@ -300,7 +335,10 @@ const SettingBoard = ({ conn, setSettingsActive, usr = "" }) => {
       <br />
       <br />
       <div className="tsc-foot">
-        by <a target="_blank" href="https://twitter.com/sanixdarker">@sanixdarker</a>
+        by{" "}
+        <a target="_blank" href="https://twitter.com/sanixdarker">
+          @sanixdarker
+        </a>
       </div>
       <br />
     </div>
@@ -337,7 +375,7 @@ let LAST_MESSAGE_TIME_SENT = Date.now();
 /**
  * THe output of the whole component
  */
-export default function App({conn, usr}) {
+export default function App({ conn, usr }) {
   // For the visibility of the component
   const [isActive, setActive] = useState(true); // default should be false
   // for the settings board
@@ -349,8 +387,7 @@ export default function App({conn, usr}) {
   const inputRef = useRef(null);
 
   useEffect(() => {
-    if (itemGet("roomKey") !== null)
-      cleanConnectRoom(conn, itemGet("roomKey"));
+    if (itemGet("roomKey") !== null) cleanConnectRoom(conn, itemGet("roomKey"));
   }, []);
 
   useEffect(() => {
@@ -359,14 +396,14 @@ export default function App({conn, usr}) {
 
   const checkAndSendTxtMsg = (ev) => {
     if (ev.keyCode === 13) {
-        if (itemGet("usrIn") == null || itemGet("usrIn") == "null"){
-            alert("Please set up your username.")
-            return
-        }
-        if (itemGet("roomKey") == null || itemGet("roomKey") == "null"){
-            alert("Please set up your roomKey.")
-            return
-        }
+      if (itemGet("usrIn") == null || itemGet("usrIn") == "null") {
+        alert("Please set up your username.");
+        return;
+      }
+      if (itemGet("roomKey") == null || itemGet("roomKey") == "null") {
+        alert("Please set up your roomKey.");
+        return;
+      }
       if (ev.target.value.length > 0) {
         const msgg = ev.target.value;
         if (msgg.length > 0) {
