@@ -62,18 +62,18 @@ func (s *Server) RemoveClient(client Client) {
 		// Read all client
 		for i := 0; i < len(*sub.Clients); i++ {
 			if client.ID != (*sub.Clients)[i].ID {
-                continue
-            }
+				continue
+			}
 
-            // If found, remove client
-            if i == len(*sub.Clients)-1 {
-                // if it's stored as the last element, crop the array length
-                *sub.Clients = (*sub.Clients)[:len(*sub.Clients)-1]
-                continue
-            }
-                // if it's stored in between elements, overwrite the element and reduce iterator to prevent out-of-bound
-            *sub.Clients = append((*sub.Clients)[:i], (*sub.Clients)[i+1:]...)
-            i--
+			// If found, remove client
+			if i == len(*sub.Clients)-1 {
+				// if it's stored as the last element, crop the array length
+				*sub.Clients = (*sub.Clients)[:len(*sub.Clients)-1]
+				continue
+			}
+			// if it's stored in between elements, overwrite the element and reduce iterator to prevent out-of-bound
+			*sub.Clients = append((*sub.Clients)[:i], (*sub.Clients)[i+1:]...)
+			i--
 		}
 	}
 }
@@ -180,10 +180,10 @@ func (s *Server) Subscribe(client *Client, topic string) {
 	for _, sub := range s.Subscriptions {
 		// if found, add client
 		if sub.Topic != topic {
-            continue
-        }
-        exist = true
-        *sub.Clients = append(*sub.Clients, *client)
+			continue
+		}
+		exist = true
+		*sub.Clients = append(*sub.Clients, *client)
 	}
 
 	// else, add new topic & add client to that topic
@@ -205,23 +205,23 @@ func (s *Server) Unsubscribe(client *Client, topic string) {
 	// Read all topics
 	for _, sub := range s.Subscriptions {
 		if sub.Topic != topic {
-            continue
-        }
-        // Read all topics' client
-        for i := 0; i < len(*sub.Clients); i++ {
-            if client.ID != (*sub.Clients)[i].ID {
-                continue
-            }
-            // If found, remove client
-            if i == len(*sub.Clients)-1 {
-                // if it's stored as the last element, crop the array length
-                *sub.Clients = (*sub.Clients)[:len(*sub.Clients)-1]
-                continue
-            }
-            // if it's stored in between elements, overwrite the element
-            // and reduce iterator to prevent out-of-bound
-            *sub.Clients = append((*sub.Clients)[:i], (*sub.Clients)[i+1:]...)
-            i--
-        }
+			continue
+		}
+		// Read all topics' client
+		for i := 0; i < len(*sub.Clients); i++ {
+			if client.ID != (*sub.Clients)[i].ID {
+				continue
+			}
+			// If found, remove client
+			if i == len(*sub.Clients)-1 {
+				// if it's stored as the last element, crop the array length
+				*sub.Clients = (*sub.Clients)[:len(*sub.Clients)-1]
+				continue
+			}
+			// if it's stored in between elements, overwrite the element
+			// and reduce iterator to prevent out-of-bound
+			*sub.Clients = append((*sub.Clients)[:i], (*sub.Clients)[i+1:]...)
+			i--
+		}
 	}
 }

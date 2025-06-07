@@ -10,10 +10,10 @@ import (
 
 // Message represents one chat message.
 type Message struct {
-	Room     string    `json:"room"`
-	User     string    `json:"user"`
-	Message  string    `json:"message"`
-	SentAt   time.Time `json:"sent_at"`
+	Room    string    `json:"room"`
+	User    string    `json:"user"`
+	Message string    `json:"message"`
+	SentAt  time.Time `json:"sent_at"`
 }
 
 // in-memory store — swap for a database whenever you like.
