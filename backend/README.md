@@ -47,7 +47,8 @@ go run main.go
 main.go
 go.mod
 handler
-└── handler.go
+└── ws.go
+└── http.go
 model
 └── model.go
 ```

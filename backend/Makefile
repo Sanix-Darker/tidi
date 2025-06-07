@@ -1,3 +1,5 @@
+.PHONY: docker-build docker-run run build format exec
+
 docker-build:
 	docker build --no-cache -t sanixdarker/tidi-backend:latest -f Dockerfile .
 
@@ -9,6 +11,9 @@ run:
 
 build:
 	go build -o ./tidi
+
+format:
+	gofmt -w .
 
 exec: build
 	./tidi

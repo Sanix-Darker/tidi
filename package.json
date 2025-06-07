@@ -40,11 +40,5 @@
     "preact-cli": "^3.0.5",
     "preact-habitat": "^3.3.0",
     "preact-render-to-string": "^6.4.2"
-  },
-  "jest": {
-    "preset": "jest-preset-preact",
-    "setupFiles": [
-      "<rootDir>/tests/__mocks__/setupTests.js"
-    ]
   }
 }
